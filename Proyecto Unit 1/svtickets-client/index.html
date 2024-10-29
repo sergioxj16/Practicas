@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Home | SVTickets</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css">
+  <script src="src/index.ts" type="module"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+  
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">SVTickets</a>
+      <ul class="navbar-nav me-auto mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" href="index.html">Events</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="new-event.html">New event</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="profile.html">My profile</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="logout">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container"> 
+    <!--Optional-->
+    <nav class="navbar navbar-light bg-light justify-content-between mt-3">
+      <div class="container-fluid justify-content-start">
+        <span>Order:</span>
+        <ul class="nav flex-grow-1">
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="orderDate">Date</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="orderPrice">Price</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="orderDistance">Distance</a>
+          </li>
+        </ul>
+        <div class="d-flex mb-0">
+          <input class="form-control me-2" type="text" name="search" id="searchInput" placeholder="Search"
+            aria-label="Search">
+          <button type="button" class="btn btn-outline-primary border-0" id="searchBtn"><i class="bi bi-search"></i></button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="text-muted" id="filterInfo">Ordering by: distance. Searching by:</div>
+
+    <div id="eventsContainer" class="mb-4 mt-4 row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+
+    </div>
+    <div class="mb-4"><button id="loadMore" class="btn btn-primary">Load More events</button></div>
+  </div>
+
+  <template id="eventTemplate">
+    <div class="col">
+      <div class="card h-100 shadow">
+        <a href=""><img class="card-img-top" src="" /></a>
+        <div class="card-body">
+          <h4 class="card-title">
+            <a class="text-decoration-none" href="">title</a>
+          </h4>
+          <p class="card-text">description</p>
+          <div class="row">
+            <!-- Remove this div if event is not mine -->  
+            <div class="col">
+              <button class="btn btn-danger delete"><i class="bi bi-trash"></i></button>
+            </div>
+            <div class="col-auto ms-auto">
+              <div class="text-end attend-users"><i class="bi bi-people-fill"></i> 0</div>
+              <div class="text-success text-end m-0 attend-button"><i class="bi bi-hand-thumbs-up-fill"></i> I'm going</div>
+              <!-- Change to bi-hand-thumbs-down-fill if the user is not attending the event  -->
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-muted row m-0">
+          <div class="col-auto avatar pl-1 pr-1">
+            <a href="">
+              <img src="" class="rounded-circle" />
+            </a>
+          </div>
+          <div class="col">
+            <div class="name"><a href="">creator.name</a></div>
+            <div class="date small text-muted">date</div>
+          </div>
+          <div class="col-auto text-end text-muted">
+            <div class="price small">€0.00</div>
+            <div class="distance small">0 km</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+</body>
+
+</html>
+

@@ -4,3 +4,7 @@
 // - Validar que los campos de email y contraseña no estén vacíos.
 // - Mostrar mensajes de error si el inicio de sesión falla.
 // - Guardar el token de autenticación en localStorage si el inicio de sesión es exitoso.
+
+import { AuthService } from "./classes/auth-service";
+import { MapService } from "./classes/map-service";
+import { MyGeolocation } from "./classes/my-geolocation";

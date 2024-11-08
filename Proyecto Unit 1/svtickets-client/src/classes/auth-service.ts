@@ -7,8 +7,28 @@
 // - Utilizar la clase Http para realizar las solicitudes HTTP al servidor.
 
 
+import { LOGIN_URL } from "../constants";
+import { Http } from "./http";
+
 export class AuthService {
+    #http: Http;
 
+    constructor() {
+        this.#http = new Http();
+    }
 
-    
+    // Método para iniciar sesión y almacenar el token
+    async login(email: string, password: string): Promise<string> {
+        const data = { email, password };
+        const response = await this.#http.post<{ accessToken: string }, typeof data>(LOGIN_URL, data);
+        
+        // Guardar el token en localStorage
+        localStorage.setItem("token", response.accessToken);
+        return response.accessToken;
+    }
+
+    // Método para cerrar sesión
+    logout(): void {
+        localStorage.removeItem("token");
+    }
 }

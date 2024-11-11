@@ -1,18 +1,15 @@
 import { GeocoderAutocomplete } from "@geoapify/geocoder-autocomplete";
 import { MyGeolocation } from "./classes/my-geolocation";
 import { MapService } from "./classes/map-service";
-import { Point } from "ol/geom";
-import { MyEventInsert } from "./interfaces/myevent";
+import { MyEventInsert } from "./myevent";
 import { EventsService } from "./classes/events-service";
 import { AuthService } from "./classes/auth-service";
 
 AuthService.checkAuth("other");
 
+let globalCoords = { latitude: 0, longitude: 0 };
 
-
-
-
-document.addEventListener("submit", () => {
+document.addEventListener("DOMContentLoaded", () => {
     const newEventForm = document.getElementById("newEvent") as HTMLFormElement;
     const imgPreview = document.getElementById("imgPreview") as HTMLImageElement;
     const eventsService = new EventsService();
@@ -24,6 +21,24 @@ document.addEventListener("submit", () => {
     const imageInput = newEventForm.querySelector("#image") as HTMLInputElement;
     const addressInput = document.createElement("input");
 
+    addressInput.type = "hidden";
+    addressInput.id = "address";
+    newEventForm.appendChild(addressInput);
+
+    const latInput = document.createElement("input");
+    latInput.type = "hidden";
+    latInput.id = "lat";
+    newEventForm.appendChild(latInput);
+
+    const lngInput = document.createElement("input");
+    lngInput.type = "hidden";
+    lngInput.id = "lng";
+    newEventForm.appendChild(lngInput);
+
+    function setValidInput(input: HTMLInputElement | HTMLTextAreaElement, valid: boolean): void {
+        input.classList.remove("is-valid", "is-invalid");
+        input.classList.add(valid ? "is-valid" : "is-invalid");
+    }
 
     function validatePrice(): boolean {
         const price = priceInput.value;
@@ -57,6 +72,27 @@ document.addEventListener("submit", () => {
         return valid;
     }
 
+    async function showMap() {
+        const coords = await MyGeolocation.getLocation();
+        const mapService = new MapService(coords, "map");
+        const marker = mapService.createMarker(coords);
+
+        const autocomplete = new GeocoderAutocomplete(
+            document.getElementById("autocomplete")!,
+            "42c7710f83bc41698b841fec7a3b5d2d",
+            { lang: "es", debounceDelay: 600 }
+        );
+
+        autocomplete.on("select", (location) => {
+            console.log(location.geometry.coordinates);
+            marker.setGeometry(new Point(location.geometry.coordinates));
+            mapService.view.setCenter(location.geometry.coordinates);
+            globalCoords = { latitude: location.geometry.coordinates[1], longitude: location.geometry.coordinates[0] };
+            latInput.value = globalCoords.latitude.toString();
+            lngInput.value = globalCoords.longitude.toString();
+            addressInput.value = autocomplete.querySelector("input")!.value;
+        });
+    }
 
     async function validateForm(event: Event): Promise<void> {
         event.preventDefault();
@@ -84,8 +120,8 @@ document.addEventListener("submit", () => {
                             date: dateInput.value,
                             price: parseFloat(priceInput.value),
                             address: addressInput.value,
-                            lat: latitude,
-                            lng: longitude,
+                            lat: globalCoords.latitude,
+                            lng: globalCoords.longitude,
                             image: base64Image
                         };
 
@@ -110,56 +146,27 @@ document.addEventListener("submit", () => {
             }
         }
     }
-});
 
+    function loadImage(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const file = input.files ? input.files[0] : null;
 
-function setValidInput(input: HTMLInputElement | HTMLTextAreaElement, valid: boolean): void {
-    input.classList.remove("is-valid", "is-invalid");
-    input.classList.add(valid ? "is-valid" : "is-invalid");
-}
-
-
-async function showMap() {
-    const coords = await MyGeolocation.getLocation();
-    const mapService = new MapService(coords, "map");
-    const marker = mapService.createMarker(coords);
-
-    const autocomplete = new GeocoderAutocomplete(
-        document.getElementById("autocomplete")!,
-        "42c7710f83bc41698b841fec7a3b5d2d",
-        { lang: "es", debounceDelay: 600 }
-    );
-
-    autocomplete.on("select", (location) => {
-        console.log(location.geometry.coordinates);
-        marker.setGeometry(new Point(location.geometry.coordinates));
-        mapService.view.setCenter(location.geometry.coordinates);
-        latInput.value = globalCoords.latitude.toString();
-        lngInput.value = globalCoords.longitude.toString();
-    });
-}
-
-
-// Vista previa de la imagen Base64
-function loadImage(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files ? input.files[0] : null;
-
-    if (file) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            imgPreview.classList.remove("d-none");
-            imgPreview.src = reader.result as string;
-        };
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                imgPreview.classList.remove("d-none");
+                imgPreview.src = reader.result as string;
+            };
+        }
     }
-}
 
-//previsualiza la imagen en el Dom
-imageInput?.addEventListener("change", loadImage);
-newEventForm.addEventListener('submit', validateForm);
-showMap();
-//boton logout
-document.getElementById("logout")?.addEventListener("click", () => {
-    AuthService.logout();
+    imageInput?.addEventListener("change", loadImage);
+    newEventForm.addEventListener('submit', validateForm);
+
+    showMap();
+
+    document.getElementById("logout")?.addEventListener("click", () => {
+        AuthService.logout();
+    });
 });

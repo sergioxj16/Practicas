@@ -7,9 +7,14 @@ AuthService.checkAuth("other");
 let events: MyEvent[] = [];
 const eventsService = new EventsService();
 
-const eventsContainer = document.getElementById("eventsContainer") as HTMLElement;
+const eventsContainer = document.getElementById(
+    "eventsContainer"
+) as HTMLElement;
 const searchInput = document.getElementById("searchInput") as HTMLInputElement;
-const eventTemplate = document.getElementById("eventTemplate") as HTMLTemplateElement;
+const searchButton = document.getElementById("searchBtn") as HTMLInputElement;
+const eventTemplate = document.getElementById(
+    "eventTemplate"
+) as HTMLTemplateElement;
 const filterInfo = document.getElementById("filterInfo") as HTMLElement;
 const loadMoreButton = document.getElementById("loadMore") as HTMLButtonElement;
 
@@ -20,9 +25,17 @@ let currentSearch = "";
 // Obtener eventos con filtros de página, orden y búsqueda
 async function getEvents() {
     try {
-        const params = { page: currentPage, order: currentOrder, search: currentSearch };
+        const params = {
+            page: currentPage,
+            order: currentOrder,
+            search: currentSearch,
+        };
 
-        const { events: newEvents, page, more } = await eventsService.getEvents(params);
+        const {
+            events: newEvents,
+            page,
+            more,
+        } = await eventsService.getEvents(params);
 
         if (page === 1) events = [];
         events = [...events, ...newEvents];
@@ -57,25 +70,37 @@ function eventToHTML(event: MyEvent): HTMLElement {
     const eventHTML = eventTemplate.content.cloneNode(true) as DocumentFragment;
     const eventCard = eventHTML.firstElementChild as HTMLElement;
 
-    (eventCard.querySelector(".card-img-top") as HTMLImageElement).src = event.image;
-    (eventCard.querySelector(".card-title") as HTMLElement).textContent = event.title;
-    (eventCard.querySelector("p.card-text") as HTMLElement).textContent = event.description;
-    (eventCard.querySelector(".date") as HTMLElement).textContent = dateFormatted;
-    (eventCard.querySelector(".price") as HTMLElement).textContent = priceFormatted;
-    (eventCard.querySelector(".distance") as HTMLElement).textContent = distanceFormatted;
+    (eventCard.querySelector(".card-img-top") as HTMLImageElement).src =
+        event.image;
+    (eventCard.querySelector(".card-title") as HTMLElement).textContent =
+        event.title;
+    (eventCard.querySelector("p.card-text") as HTMLElement).textContent =
+        event.description;
+    (eventCard.querySelector(".date") as HTMLElement).textContent =
+        dateFormatted;
+    (eventCard.querySelector(".price") as HTMLElement).textContent =
+        priceFormatted;
+    (eventCard.querySelector(".distance") as HTMLElement).textContent =
+        distanceFormatted;
 
     // Actualizar el número de asistentes
     const peopleCount = eventCard.querySelector(".attend-users") as HTMLElement;
-    peopleCount.textContent = `${event.numAttend} ${event.numAttend === 1 ? "person" : "people"}`;
+    peopleCount.textContent = `${event.numAttend} ${
+        event.numAttend === 1 ? "person" : "people"
+    }`;
 
     if (event.creator && event.creator.avatar) {
-        (eventCard.querySelector(".avatar img") as HTMLImageElement).src = event.creator.avatar;
+        (eventCard.querySelector(".avatar img") as HTMLImageElement).src =
+            event.creator.avatar;
     }
     if (event.creator && event.creator.name) {
-        (eventCard.querySelector(".name a") as HTMLAnchorElement).textContent = event.creator.name;
+        (eventCard.querySelector(".name a") as HTMLAnchorElement).textContent =
+            event.creator.name;
     }
 
-    const deleteBtn = eventCard.querySelector("button.delete") as HTMLButtonElement;
+    const deleteBtn = eventCard.querySelector(
+        "button.delete"
+    ) as HTMLButtonElement;
     if (event.mine) {
         deleteBtn.style.display = "block";
         deleteBtn.addEventListener("click", async () => {
@@ -91,7 +116,6 @@ function eventToHTML(event: MyEvent): HTMLElement {
 
     return eventCard;
 }
-
 
 // Eventos de ordenamiento
 document.getElementById("orderPrice")?.addEventListener("click", (e) => {
@@ -119,7 +143,7 @@ document.getElementById("orderDistance")?.addEventListener("click", (e) => {
 });
 
 // Evento de búsqueda
-searchInput.addEventListener("input", () => {
+searchButton.addEventListener("click", () => {
     currentSearch = searchInput.value;
     filterInfo.textContent = `Ordering by: ${currentOrder}. Searching by: "${currentSearch}"`;
     currentPage = 1;

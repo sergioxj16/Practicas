@@ -89,6 +89,7 @@ export class AuthService {
         } else {
             if (page === "other") {
                 window.location.href = "login.html";
+                alert("Expired login.");
             }
         }
     }
@@ -99,3 +100,4 @@ export class AuthService {
         window.location.href = "login.html";
     }
 }
+

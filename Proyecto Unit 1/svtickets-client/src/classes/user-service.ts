@@ -11,16 +11,21 @@ import { USER_PROFILE_URL, UPDATE_AVATAR_URL, UPDATE_PROFILE_URL, UPDATE_PASSWOR
 import { Http } from "./http";
 import { User } from "../interfaces/user";
 
-export class UserService {
-    // Método para obtener el perfil del usuario
+export class UserService {   
+    #http: Http; 
+
+    constructor() {
+        this.#http = new Http();
+    };
+    
     async getUserProfile(): Promise<User> {
-        const response = await Http.get(USER_PROFILE_URL);
+        const response = await this.#http.get<{ user: User }>(USER_PROFILE_URL);
         return response.user;
     }
     
     // Método para actualizar el perfil del usuario
     async updateUserProfile(user: User): Promise<void> {
-        await Http.put(UPDATE_PROFILE_URL, {
+        await this.#http.put(UPDATE_PROFILE_URL, {
             name: user.name,
             email: user.email
         });
@@ -28,14 +33,14 @@ export class UserService {
 
     // Método para cambiar la contraseña del usuario
     async changePassword(oldPassword: string, newPassword: string): Promise<void> {
-        await Http.put(UPDATE_PASSWORD_URL, {
+        await this.#http.put(UPDATE_PASSWORD_URL, {
             password: newPassword
         });
     }
 
     // Método para actualizar el avatar del usuario
     async updateAvatar(base64Image: string): Promise<string> {
-        const response = await Http.put(UPDATE_AVATAR_URL, {
+        const response = await this.#http.put<{ user: User }, { avatar: string }>(UPDATE_AVATAR_URL, {
             avatar: base64Image
         });
         return response.user.avatar;

@@ -20,7 +20,7 @@ export class EventsService {
             more: boolean;
         }>(url);
         
-        return response;  // La respuesta ahora está tipada correctamente
+        return response; 
     }
 
     // Crear el string de query a partir de los parámetros

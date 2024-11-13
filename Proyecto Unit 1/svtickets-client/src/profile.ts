@@ -3,3 +3,6 @@
 // - Permitir la edición del avatar, nombre, email y contraseña.
 // - Implementar la lógica para actualizar el perfil del usuario en el servidor.
 // - Validar los cambios antes de enviarlos (por ejemplo, verificar que los campos no estén vacíos).
+
+import { UserService } from "./classes/user-service";
+

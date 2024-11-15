@@ -21,8 +21,14 @@ const emailElement = document.getElementById("email") as HTMLElement;
 const mapElementId = "map";
 
 async function loadUserProfile(): Promise<void> {
-    const profile = await userService.getUserProfile();
-    
+    // Obtener el id de la URL si está presente
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get("id");
+    const profile = userId ? 
+
+    await userService.getUserProfileById(userId) : 
+    await userService.getUserProfile();
+
     if (profile) {
         nameElement.textContent = profile.name;
         emailElement.textContent = profile.email;
@@ -55,25 +61,19 @@ function initEditButtons(profile: User) {
 
     profileForm.onsubmit = async (event) => {
         event.preventDefault();
-        const name = (document.getElementById("name") as HTMLInputElement).value.trim();
-        const email = (document.getElementById("email2") as HTMLInputElement).value.trim();
-        if (name && email) {
-            await userService.updateUserProfile({
-                name, 
-                email, 
-                avatar: "",
-                lat: 0,
-                lng: 0  
-            });
+        const name = (document.getElementById("name2") as HTMLInputElement).value.trim();
+        const mail = (document.getElementById("email2") as HTMLInputElement).value.trim();
+        if (name && mail) {
+            await userService.updateUserProfile(name, mail);
             nameElement.textContent = name;
-            emailElement.textContent = email;
+            emailElement.textContent = mail;
+
             profileForm.classList.add("d-none");
             profileInfo.classList.remove("d-none");
         }
     };
     
-
-
+    
     editPasswordBtn.onclick = () => {
         profileInfo.classList.add("d-none");
         passwordForm.classList.remove("d-none");
@@ -89,7 +89,7 @@ function initEditButtons(profile: User) {
         const password = (document.getElementById("password") as HTMLInputElement).value;
         const password2 = (document.getElementById("password2") as HTMLInputElement).value;
         if (password && password === password2) {
-            await userService.changePassword(password, password2);
+            await userService.changePassword(password);
             passwordForm.classList.add("d-none");
             profileInfo.classList.remove("d-none");
         } else {

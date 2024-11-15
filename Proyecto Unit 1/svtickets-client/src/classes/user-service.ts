@@ -7,7 +7,7 @@
 // - Utilizar la clase Http para realizar las solicitudes HTTP al servidor.
 
 
-import { USER_PROFILE_URL, UPDATE_AVATAR_URL, UPDATE_PROFILE_URL, UPDATE_PASSWORD_URL } from "../constants";
+import { USER_PROFILE_URL, UPDATE_AVATAR_URL, UPDATE_PROFILE_URL, UPDATE_PASSWORD_URL, GET_PROFILE_USERS_URL } from "../constants";
 import { Http } from "./http";
 import { User } from "../interfaces/user";
 
@@ -22,17 +22,19 @@ export class UserService {
         const response = await this.#http.get<{ user: User }>(USER_PROFILE_URL);
         return response.user;
     }
+
+    async getUserProfileById(userId: string): Promise<User> {
+        const response = await this.#http.get<{ user: User }>(`${GET_PROFILE_USERS_URL}/${userId}`);
+        return response.user;
+    }
     
     // Método para actualizar el perfil del usuario
-    async updateUserProfile(user: User): Promise<void> {
-        await this.#http.put(UPDATE_PROFILE_URL, {
-            name: user.name,
-            email: user.email
-        });
+    async updateUserProfile(name: string, email: string): Promise<void> {
+        await this.#http.put(UPDATE_PROFILE_URL, {name: name, email: email});
     }
 
     // Método para cambiar la contraseña del usuario
-    async changePassword(oldPassword: string, newPassword: string): Promise<void> {
+    async changePassword(newPassword: string): Promise<void> {
         await this.#http.put(UPDATE_PASSWORD_URL, {
             password: newPassword
         });

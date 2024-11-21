@@ -22,7 +22,6 @@ let currentPage = 1;
 let currentOrder = "distance";
 let currentSearch = "";
 
-// Obtener eventos con filtros de página, orden y búsqueda
 async function getEvents() {
     try {
         const params = {
@@ -47,12 +46,10 @@ async function getEvents() {
     }
 }
 
-// Mostrar eventos en el contenedor de HTML
 function showEvents(events: MyEvent[]) {
     eventsContainer.replaceChildren(...events.map(eventToHTML));
 }
 
-// Convertir un evento a un elemento HTML usando la plantilla
 function eventToHTML(event: MyEvent): HTMLElement {
     const dateFormatted = new Intl.DateTimeFormat("en", {
         day: "2-digit",
@@ -83,7 +80,6 @@ function eventToHTML(event: MyEvent): HTMLElement {
     (eventCard.querySelector(".distance") as HTMLElement).textContent =
         distanceFormatted;
 
-    // Actualizar el número de asistentes
     const peopleCount = eventCard.querySelector(".attend-users") as HTMLElement;
     peopleCount.textContent = `${event.numAttend} ${
         event.numAttend === 1 ? "person" : "people"
@@ -97,6 +93,10 @@ function eventToHTML(event: MyEvent): HTMLElement {
         (eventCard.querySelector(".name a") as HTMLAnchorElement).textContent =
             event.creator.name;
     }
+
+    eventCard.addEventListener("click", () => {
+        window.location.href = `event-detail.html?id=${event.id}`;
+    });
 
     const deleteBtn = eventCard.querySelector(
         "button.delete"
@@ -117,7 +117,6 @@ function eventToHTML(event: MyEvent): HTMLElement {
     return eventCard;
 }
 
-// Eventos de ordenamiento
 document.getElementById("orderPrice")?.addEventListener("click", (e) => {
     e.preventDefault();
     currentOrder = "price";
@@ -142,7 +141,6 @@ document.getElementById("orderDistance")?.addEventListener("click", (e) => {
     getEvents();
 });
 
-// Evento de búsqueda
 searchButton.addEventListener("click", () => {
     currentSearch = searchInput.value;
     filterInfo.textContent = `Ordering by: ${currentOrder}. Searching by: "${currentSearch}"`;
@@ -150,13 +148,11 @@ searchButton.addEventListener("click", () => {
     getEvents();
 });
 
-// Botón de cargar más
 loadMoreButton.addEventListener("click", () => {
     currentPage++;
     getEvents();
 });
 
-// Seleccionamos el botón de logout y le añadimos el evento
 document.getElementById("logout")?.addEventListener("click", () => {
     AuthService.logout();
 });

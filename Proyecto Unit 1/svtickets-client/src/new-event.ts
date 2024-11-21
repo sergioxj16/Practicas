@@ -7,16 +7,13 @@ import { EventsService } from "./classes/events-service";
 import { AuthService } from "./classes/auth-service";
 import { Coordinates } from "./interfaces/coordinates";
 
-// Verifica la autenticación
 AuthService.checkAuth("other");
 
-// Variable global para almacenar coordenadas
 const globalCoordinates: Coordinates = {
     latitude: 0,
     longitude: 0,
 };
 
-// Inicializar elementos del formulario y servicios
 const newEventForm = document.getElementById("newEvent") as HTMLFormElement;
 const imgPreview = document.getElementById("imgPreview") as HTMLImageElement;
 const titleInput = newEventForm.querySelector("#title") as HTMLInputElement;
@@ -29,7 +26,6 @@ const imageInput = newEventForm.querySelector("#image") as HTMLInputElement;
 const autocompleteDiv = document.getElementById("autocomplete")!;
 const eventsService = new EventsService();
 
-// Validación de cada campo
 function setValidInput(
     input: HTMLInputElement | HTMLTextAreaElement,
     valid: boolean
@@ -72,7 +68,6 @@ function validateImage(): boolean {
     return valid;
 }
 
-// Cargar la imagen en Base64 para vista previa
 function loadImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files ? input.files[0] : null;
@@ -87,7 +82,6 @@ function loadImage(event: Event): void {
     }
 }
 
-// Función para mostrar el mapa y actualizar las coordenadas globales
 async function showMap() {
     const coords = await MyGeolocation.getLocation();
     const mapService = new MapService(coords, "map");
@@ -98,8 +92,6 @@ async function showMap() {
         "42c7710f83bc41698b841fec7a3b5d2d",
         { lang: "es", debounceDelay: 600 }
     );
-
-    // const autocompleteInput = (document.getElementById("autocomplete")!.querySelector(".geoapify-autocomplete-input")! as HTMLInputElement).value;
 
     autocomplete.on("select", (location) => {
         const locationCoords = location.geometry.coordinates as [
@@ -115,11 +107,9 @@ async function showMap() {
     });
 }
 
-// Función de validación y envío del formulario
 async function validateForm(event: Event): Promise<void> {
     event.preventDefault();
 
-    // Validar cada campo y detener si alguna validación falla
     if (!validateTitle()) {
         return;
     }
@@ -175,7 +165,6 @@ async function validateForm(event: Event): Promise<void> {
         }
     } catch (error) {
         console.log(error);
-        // alert("Error: " + error);
     }
 }
 

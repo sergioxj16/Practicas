@@ -7,13 +7,13 @@ export class MyGeolocation {
                 },
                 error => {
                     switch (error.code) {
-                        case error.PERMISSION_DENIED: // User didn't allow the web page to retrieve location
+                        case error.PERMISSION_DENIED:
                             reject("User denied the request for Geolocation.");
                             break;
-                        case error.POSITION_UNAVAILABLE: // Couldn't get the location
+                        case error.POSITION_UNAVAILABLE: 
                             reject("Location information is unavailable.");
                             break;
-                        case error.TIMEOUT: // The maximum amount of time to get location information has passed
+                        case error.TIMEOUT:
                             reject("The request to get user location timed out.");
                             break;
                         default:

@@ -1,7 +1,7 @@
 import { AuthService } from "./classes/auth-service";
 import { MyGeolocation } from "./classes/my-geolocation";
 import { User } from "./interfaces/user";
-import { MapService } from "./classes/map-service"; // Importa el MapService si es necesario
+import { MapService } from "./classes/map-service";
 
 AuthService.checkAuth("register");
 
@@ -27,7 +27,6 @@ MyGeolocation.getLocation()
         latInput.value = latitude.toString();
         lngInput.value = longitude.toString();
 
-        // Inicializar el mapa y agregar el marcador
         mapService = new MapService({ latitude, longitude }, "map");
         mapService.createMarker({ latitude, longitude });
     })
@@ -37,7 +36,6 @@ MyGeolocation.getLocation()
         errorInfo.textContent = "Error getting location: " + error;
     });
 
-// Vista previa de la imagen Base64
 function loadImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files ? input.files[0] : null;
@@ -48,14 +46,13 @@ function loadImage(event: Event): void {
         reader.readAsDataURL(file);
 
         reader.onload = () => {
-            avatarBase64 = reader.result as string;  // Guardamos el avatar en base64
+            avatarBase64 = reader.result as string;  
             imgPreview.classList.remove("d-none");
-            imgPreview.src = avatarBase64;  // Actualizamos la imagen vista previa
+            imgPreview.src = avatarBase64;
         };
     }
 }
 
-// Verifica que los emails coincidan
 function checkMail(emailInput: string, email2Input: string): boolean {
     return emailInput === email2Input;
 }
@@ -70,17 +67,15 @@ formRegister.addEventListener("submit", async (event) => {
             name: nameInput.value,
             email: emailInput.value,
             password: passwordInput.value,
-            avatar: avatarBase64,  // Usamos el avatar en base64
+            avatar: avatarBase64, 
             lat: parseFloat(latInput.value),
             lng: parseFloat(lngInput.value),
         };
 
         try {
-            // Usar el servicio de autenticación para registrar al usuario
             const authService = new AuthService();
             await authService.register(userInfo);
 
-            // Redirigir a login si el registro fue exitoso
             window.location.href = "login.html";
         } catch (error) {
             errorInfo.textContent = "" + error;
@@ -90,5 +85,4 @@ formRegister.addEventListener("submit", async (event) => {
     }
 });
 
-// Añadir evento para cargar la imagen seleccionada
 photoInput.addEventListener("change", loadImage);

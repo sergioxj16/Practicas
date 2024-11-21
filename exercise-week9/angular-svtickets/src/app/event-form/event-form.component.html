@@ -1,0 +1,33 @@
+<form class="mt-4" #eventForm="ngForm" (ngSubmit)="addEvent(eventForm)">
+  <div class="mb-3">
+    <label for="title" class="form-label">Title</label>
+    <input type="text" class="form-control" name="title" id="title" placeholder="Enter title" [(ngModel)]="newEvent.title">
+    <div class="invalid-feedback">Title is required and can only contain letters and spaces.</div>
+  </div>
+  <div class="mb-3">
+    <label for="date" class="form-label">Date</label>
+    <input type="date" class="form-control" id="date" name="date" [(ngModel)]="newEvent.date">
+    <div class="invalid-feedback">Date is required.</div>
+  </div>
+  <div class="mb-3">
+    <label for="description" class="form-label">Description</label>
+    <textarea class="form-control" id="description" name="description" rows="3" [(ngModel)]="newEvent.description"></textarea>
+    <div class="invalid-feedback">Description is required.</div>
+  </div>
+  <div class="mb-3">
+    <label for="price" class="form-label">Price (in €)</label>
+    <input type="number" class="form-control" id="price" name="price" min="0.00" max="10000.00" step="0.01" [(ngModel)]="newEvent.price" />
+    <div class="invalid-feedback">Price must be a positive number.</div>
+  </div>
+  <div class="mb-3">
+    <label for="image" class="form-label">Image</label>
+    <input type="file" class="form-control" id="image" name="image" encodeBase64 (encoded)="newEvent.image = $event" />
+    <div class="invalid-feedback">An image is required.</div>
+  </div>
+  @if(newEvent.image) {
+    <img [src]="newEvent.image" alt="" class="img-thumbnail mb-3">
+  }
+  <div>
+    <button type="submit" class="btn btn-primary">Create</button>
+  </div>
+</form>

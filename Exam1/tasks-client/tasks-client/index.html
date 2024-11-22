@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Tasks manager</title>
+    <script type="module" src="/src/index.ts"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-header bg-primary text-white">My tasks List</div>
+        <div class="card-block">
+          <div class="table-responsive">
+            <table class="table table-striped m-0" id="taskTable">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Task</th>
+                  <th>Finished</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <template id="taskTemplate">
+      <tr>
+        <td>id</td>
+        <td>description</td>
+        <td>
+          <!-- You can use both buttons and hide one, or use only one button and change text and CSS class -->
+          <button class="btn btn-sm btn-success">🗹 Yes</button>
+          <button class="btn btn-sm btn-danger">🗷 No</button>
+        </td>
+      </tr>
+    </template>
+  </body>
+</html>

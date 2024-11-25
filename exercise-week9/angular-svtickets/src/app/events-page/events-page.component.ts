@@ -1,9 +1,10 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { EventFormComponent } from '../event-form/event-form.component';
 import { MyEvent } from '../interfaces/my-event';
 import { EventCardComponent } from '../event-card/event-card.component';
 import { FormsModule } from '@angular/forms';
-
+import { EventsService } from '../services/events.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'events-page',
   standalone: true,
@@ -13,6 +14,22 @@ import { FormsModule } from '@angular/forms';
 })
 
 export class EventsPageComponent {
+  #eventsService = inject(EventsService);
+
+  constructor() {
+    this.#eventsService
+      .getEvents()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (events) => {
+          this.events.set(events);
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+  }
+
   events = signal<MyEvent[]>([]);
 
   search = signal('');

@@ -61,7 +61,7 @@ formRegister.addEventListener("submit", async (event) => {
     event.preventDefault();
     errorInfo.textContent = "";
 
-    // Validar que los emails coinciden
+
     if (checkMail(emailInput.value, email2Input.value)) {
         const userInfo: User = {
             name: nameInput.value,

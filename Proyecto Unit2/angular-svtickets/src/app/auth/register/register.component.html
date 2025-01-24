@@ -1,0 +1,90 @@
+<form action="#" id="form-register" class="mt-4" (ngSubmit)="register()" [formGroup]="registerForm">
+	<legend>Create an account</legend>
+
+	<div class="mb-3">
+		<label for="name">Name:</label>
+		<input type="text" class="form-control" id="name" name="name" placeholder="Name" formControlName="name"
+			[validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}" />
+
+		@let nameError = registerForm.get('name')?.errors;
+
+		@if(nameError?.['required']) {
+		<div class="invalid-feedback">Name is empty.</div>
+		}
+	</div>
+
+	<div class="mb-3">
+		<label for="email">Email:</label>
+		<input type="email" class="form-control" id="email" name="email" placeholder="Email" formControlName="email"
+			[validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}">
+
+		@let emailError = registerForm.get('email')?.errors;
+
+		@if(emailError?.['required']) {
+		<div class="invalid-feedback">Email is empty.</div>
+		}
+
+		@if(emailError?.['email']) {
+		<div class="invalid-feedback">Email is not email.</div>
+		}
+	</div>
+
+	<div class="mb-3">
+		<label for="emailConfirm">Repeat Email:</label>
+		<input type="email" class="form-control" id="emailConfirm" name="emailConfirm" placeholder="Email" formControlName="emailConfirm"
+			[validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}">
+
+		@let emailComfirmError = registerForm.get('emailConfirm')?.errors;
+
+		@if(emailComfirmError?.['required']) {
+		<div class="invalid-feedback">Email is empty.</div>
+		}
+
+		@if(emailComfirmError?.['email']) {
+		<div class="invalid-feedback">Email is not email.</div>
+		}
+	</div>
+
+	<div class="mb-3">
+		<label for="password">Password:</label>
+		<input type="password" class="form-control" id="password" name="password" placeholder="Password"
+			formControlName="password" [validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}" />
+
+		@let passwordErrors = registerForm.get('password')?.errors;
+
+		@if(passwordErrors?.['required']) {
+		<div class="invalid-feedback">Password is empty.</div>
+		}
+
+		@if(passwordErrors?.['minlength']) {
+		<div class="invalid-feedback">password must be more than 4 characters.</div>
+		}
+	</div>
+    <div class="form-row">
+        <div class="mb-3 col">
+            <label for="lat">Latitude:</label>
+            <input type="text" class="form-control" id="lat" name="lat" placeholder="Geolocating..." readonly formControlName="lat"/>
+        </div>
+        <div class="mb-3 col">
+            <label for="lng">Longitude:</label>
+            <input type="text" class="form-control" id="lng" name="lng" placeholder="Geolocating..." readonly formControlName="lng"/>
+        </div>
+    </div>
+	<div class="mb-3">
+		<label for="avatar">Avatar image</label>
+		<input type="file" class="form-control" id="avatar" name="avatar" encodeBase64 (encoded)="base64image = $event"
+			formControlName="avatar" #fileInput (change)="checkImage(fileInput)"
+			[validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}" />
+
+		@let avatarError = registerForm.get('avatar')?.errors;
+
+		@if (avatarError?.['required']) {
+		<div class="invalid-feedback">Avatar required</div>
+		}
+	</div>
+	<img src="" alt="" id="imgPreview" class="img-thumbnail d-none" />
+
+	<p class="text-danger" id="errorInfo"></p>
+	<a class="btn btn-secondary" [routerLink]="['/auth/loginForm']" role="button">Go back</a>
+	<button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">Register</button>
+</form>

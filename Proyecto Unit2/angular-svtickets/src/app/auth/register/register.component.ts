@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -19,6 +19,8 @@ export class RegisterComponent implements CanComponentDeactivate {
 	private router = inject(Router);
 	private authService = inject(AuthService);
 	private formBuilder = inject(NonNullableFormBuilder);
+
+	errorMessage = signal<number | null>(null);;
 
 	registerForm = this.formBuilder.group({
 		name: ['', [Validators.required]],
@@ -57,9 +59,11 @@ export class RegisterComponent implements CanComponentDeactivate {
 			next: () => {
 				this.router.navigate(['/login']);
 				this.saved = true;
+				this.errorMessage.set(null);
 			},
 			error: (err) => {
 				console.error('Registration error:', err);
+				this.errorMessage.set(err.status);
 			}
 		});
 	}

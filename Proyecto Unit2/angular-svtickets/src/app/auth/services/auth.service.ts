@@ -11,6 +11,11 @@ import { catchError, map, Observable, of } from 'rxjs';
 })
 export class AuthService {
 	private http = inject(HttpClient);
+	#logged: WritableSignal<boolean> = signal(false);
+
+	get logged() {
+		return this.#logged.asReadonly();
+	}
 
 	login(user: UserLogin) {
 		const loginUrl = 'auth/login';
@@ -20,7 +25,7 @@ export class AuthService {
 		}));
 	}
 
-	register(user: User):Observable<void> {
+	register(user: User): Observable<void> {
 		const registerUrl = 'auth/register';
 
 		return this.http.post<UsersResponse>(registerUrl, user).pipe(map(() => {
@@ -28,13 +33,7 @@ export class AuthService {
 		}));
 	}
 
-	#logged: WritableSignal<boolean> = signal(false);
-
-	get logged() {
-		return this.#logged.asReadonly();
-	}
-
-	isLogged(): Observable<boolean> {
+	isLogged() {
 		const token = localStorage.getItem('token');
 
 		if (!this.#logged && !token) {

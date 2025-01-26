@@ -1,4 +1,4 @@
-import { MyEvent } from "./myevent";
+import { MyEvent, Comment } from "./myevent";
 import { User } from "./user";
 
 export interface EventsResponse {
@@ -26,4 +26,16 @@ export interface AvatarResponse {
 
 export interface UsersResponse {
     users: User[];
+}
+
+export interface CommentsResponses {
+    comments: Comment[];
+}
+
+export interface CommentResponse {
+    comment: Comment;
+}
+
+export interface AttendeesResponse { 
+    attendees: User[];
 }

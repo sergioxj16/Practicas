@@ -34,6 +34,6 @@
 	
 	<div>
 		<a class="btn btn-secondary" [routerLink]="['/auth/register']" role="button">Create account</a>
-		<button type="submit" class="btn btn-primary">Login</button>
+		<button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Login</button>
 	</div>
 </form>

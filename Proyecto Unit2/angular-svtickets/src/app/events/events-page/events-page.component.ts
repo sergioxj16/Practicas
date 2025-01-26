@@ -1,10 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { EventFormComponent } from '../event-form/event-form.component';
-import { MyEvent } from '../interfaces/my-event';
 import { EventCardComponent } from '../event-card/event-card.component';
 import { FormsModule } from '@angular/forms';
 import { EventsService } from '../services/events.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MyEvent } from '../../shared/interfaces/myevent';
 
 @Component({
     selector: 'events-page',
@@ -13,45 +13,45 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     styleUrl: './events-page.component.css'
 })
 export class EventsPageComponent {
-  events = signal<MyEvent[]>([]);
+    events = signal<MyEvent[]>([]);
 
-  search = signal('');
+    search = signal('');
 
-  filteredEvents = computed(() => {
-    const searchLower = this.search().toLowerCase();
-    return this.events().filter(
-      (e) =>
-        e.title.toLowerCase().includes(searchLower) ||
-        e.description.toLowerCase().includes(searchLower)
-    );
-  });
+    filteredEvents = computed(() => {
+        const searchLower = this.search().toLowerCase();
+        return this.events().filter(
+            (e) =>
+                e.title.toLowerCase().includes(searchLower) ||
+                e.description.toLowerCase().includes(searchLower)
+        );
+    });
 
-  #eventsService = inject(EventsService);
+    #eventsService = inject(EventsService);
 
-  constructor() {
-    this.#eventsService
-      .getEvents()
-      .pipe(takeUntilDestroyed())
-      .subscribe((events) => this.events.set(events));
-  }
+    constructor() {
+        this.#eventsService
+            .getEvents(new URLSearchParams())
+            .pipe(takeUntilDestroyed())
+            .subscribe((response) => this.events.set(response.events));
+    }
 
-  addEvent(event: MyEvent) {
-    this.events.update((events) => [...events, event]);
-  }
+    addEvent(event: MyEvent) {
+        this.events.update((events) => [...events, event]);
+    }
 
-  deleteEvent(event: MyEvent) {
-    this.events.update((events) => events.filter((e) => e !== event));
-  }
+    deleteEvent(event: MyEvent) {
+        this.events.update((events) => events.filter((e) => e !== event));
+    }
 
-  orderDate() {
-    this.events.update((events) =>
-      events.toSorted((e1, e2) => e1.date.localeCompare(e2.date))
-    );
-  }
+    orderDate() {
+        this.events.update((events) =>
+            events.toSorted((e1, e2) => e1.date.localeCompare(e2.date))
+        );
+    }
 
-  orderPrice() {
-    this.events.update((events) =>
-      events.toSorted((e1, e2) => e1.price - e2.price)
-    );
-  }
+    orderPrice() {
+        this.events.update((events) =>
+            events.toSorted((e1, e2) => e1.price - e2.price)
+        );
+    }
 }

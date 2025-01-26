@@ -22,4 +22,5 @@ export class TopMenuComponent {
 		this.authService.logout();
 		this.router.navigate(['auth/login']);
 	}
+
 }

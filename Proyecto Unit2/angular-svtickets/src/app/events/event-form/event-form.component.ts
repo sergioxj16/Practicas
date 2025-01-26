@@ -7,8 +7,8 @@ import { EncodeBase64Directive } from '../../shared/directives/encode-base64.dir
 import { MinDateDirective } from '../../shared/directives/min-date.directive';
 import { ValidationClassesDirective } from '../../shared/directives/validation-classes.directive';
 import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
-import { MyEvent } from '../interfaces/my-event';
 import { EventsService } from '../services/events.service';
+import { MyEvent } from '../../shared/interfaces/myevent';
 
 @Component({
     selector: 'event-form',
@@ -16,36 +16,18 @@ import { EventsService } from '../services/events.service';
     templateUrl: './event-form.component.html',
     styleUrl: './event-form.component.css'
 })
+
 export class EventFormComponent implements CanComponentDeactivate {
-  added = output<MyEvent>();
-  #eventsService = inject(EventsService);
-  #destroyRef = inject(DestroyRef);
-  #router = inject(Router);
+    added = output<MyEvent>();
+    #eventsService = inject(EventsService);
+    #destroyRef = inject(DestroyRef);
+    #router = inject(Router);
+    saved = false;
 
-  newEvent: MyEvent = {
-    title: '',
-    description: '',
-    date: '',
-    image: '',
-    price: 0,
-  };
-  saved = false;
-  today = new Date().toISOString().slice(0,10);
-
-  addEvent() {
-    this.#eventsService
-      .addEvent(this.newEvent)
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe(() => {
-        this.saved = true;
-        this.#router.navigate(['/events']);
-      });
-  }
-
-  canDeactivate() {
-    return (
-      this.saved ||
-      confirm('Do you want to leave the page? Changes will be lost...')
-    );
-  }
+    canDeactivate() {
+        return (
+            this.saved ||
+            confirm('¿Quieres abandonar la página?. Los cambios se perderán...')
+        );
+    }
 }

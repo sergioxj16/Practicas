@@ -4,8 +4,6 @@ import { User, UserLogin } from '../../shared/interfaces/user';
 import { TokenResponse, UsersResponse } from '../../shared/interfaces/responses';
 import { catchError, map, Observable, of } from 'rxjs';
 
-
-
 @Injectable({
 	providedIn: 'root'
 })
@@ -13,9 +11,6 @@ export class AuthService {
 	private http = inject(HttpClient);
 	#logged: WritableSignal<boolean> = signal(false);
 
-	get logged() {
-		return this.#logged.asReadonly();
-	}
 
 	login(user: UserLogin) {
 		const loginUrl = 'auth/login';
@@ -23,6 +18,10 @@ export class AuthService {
 			localStorage.setItem('token', res.accessToken);
 			this.#logged.set(true);
 		}));
+	}
+
+	get logged() {
+		return this.#logged.asReadonly();
 	}
 
 	register(user: User): Observable<void> {
@@ -33,10 +32,26 @@ export class AuthService {
 		}));
 	}
 
-	isLogged() {
+	validateToken(): Observable<boolean> {
+		const token = localStorage.getItem('token');
+		const headers = { Authorization: `Bearer ${token}` };
+
+		return this.http.get("auth/validate", { headers }).pipe(map(() => {
+			this.#logged.set(true);
+			return true;
+		}),
+			catchError(() => {
+				localStorage.removeItem('token');
+				this.#logged.set(false);
+				return of(false);
+			})
+		);
+	}
+
+	isLogged(): Observable<boolean> {
 		const token = localStorage.getItem('token');
 
-		if (!this.#logged && !token) {
+		if (!this.#logged() && !token) {
 			return of(false);
 		}
 
@@ -44,18 +59,7 @@ export class AuthService {
 			return of(true);
 		}
 
-		const checkUrl = 'auth/validated';
-
-		return this.http.get(checkUrl).pipe(map(() => {
-			this.#logged.set(true);
-			return true;
-		}),
-			catchError(() => {
-				this.#logged.set(false);
-				localStorage.removeItem('token');
-				return of(false);
-			}
-			));
+		return this.validateToken();
 	}
 
 	logout() {

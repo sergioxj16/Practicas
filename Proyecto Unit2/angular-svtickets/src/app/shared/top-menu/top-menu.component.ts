@@ -13,14 +13,14 @@ import { AuthService } from '../../auth/services/auth.service';
 export class TopMenuComponent {
 	title = 'SVTickets';
 
-	private authService = inject(AuthService);
-	private router = inject(Router);
+	#authService = inject(AuthService);
+	#router = inject(Router);
 
-	isLogged = computed(() => { return this.authService.logged() });
+	isLogged = computed(() => { return this.#authService.logged() });
 
 	logout() {
-		this.authService.logout();
-		this.router.navigate(['auth/login']);
+		this.#authService.logout();
+		this.#router.navigate(['auth/login']);
 	}
 
 }

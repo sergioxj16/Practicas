@@ -1,57 +1,152 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { EventFormComponent } from '../event-form/event-form.component';
+import { Component, computed, DestroyRef, effect, inject, input, signal } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventCardComponent } from '../event-card/event-card.component';
-import { FormsModule } from '@angular/forms';
+import { ProfileService } from '../../profile/services/profile.service';
 import { EventsService } from '../services/events.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MyEvent } from '../../shared/interfaces/myevent';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+
 
 @Component({
     selector: 'events-page',
-    imports: [EventFormComponent, EventCardComponent, FormsModule],
+    imports: [FormsModule, ReactiveFormsModule, EventCardComponent],
     templateUrl: './events-page.component.html',
-    styleUrl: './events-page.component.css'
+    styleUrls: ['./events-page.component.css']
 })
 export class EventsPageComponent {
-    events = signal<MyEvent[]>([]);
+    #eventsService = inject(EventsService);
+    #profileService = inject(ProfileService);
+    #destroyRef = inject(DestroyRef);
 
-    search = signal('');
+    filterDescription = signal<string>('');
+    searchControl = new FormControl('');
+    currentPage = signal<number>(1);
+    creator = input<number>();
+    attending = input<number>();
+    hasMoreEvents = signal<boolean>(false);
+    events = signal<MyEvent[]>([]);
+    sortOrder = signal<string>('');
+
+    searchQuery = toSignal(
+        this.searchControl.valueChanges.pipe(
+            debounceTime(600),
+            distinctUntilChanged()
+        ),
+        { initialValue: '' }
+    );
+
+    urlParams = computed(() => {
+        const params: Record<string, string> = {
+            search: this.searchQuery()!,
+            page: String(this.currentPage())
+        };
+
+        if (this.creator()) {
+            params['creator'] = String(this.creator());
+        } else if (this.attending()) {
+            params['attending'] = String(this.attending());
+        }
+
+        return new URLSearchParams(params);
+    });
 
     filteredEvents = computed(() => {
-        const searchLower = this.search().toLowerCase();
+        const searchLower = this.searchQuery()!.toLowerCase();
         return this.events().filter(
-            (e) =>
-                e.title.toLowerCase().includes(searchLower) ||
-                e.description.toLowerCase().includes(searchLower)
+            (e) => e.title?.toLowerCase().includes(searchLower) ||
+                e.description?.toLowerCase().includes(searchLower)
         );
     });
 
-    #eventsService = inject(EventsService);
-
     constructor() {
-        this.#eventsService
-            .getEvents(new URLSearchParams())
-            .pipe(takeUntilDestroyed())
-            .subscribe((response) => this.events.set(response.events));
+        effect(() => {
+            this.loadEvents();
+        });
+
+        effect(() => {
+            const filters: string[] = [];
+            const searchValue = this.searchQuery()?.trim();
+            const orderBy = this.sortOrder();
+            const creatorId = this.creator();
+            const attendingId = this.attending();
+
+            if (searchValue) filters.push(`Searching by: "${this.searchQuery()}"`);
+            if (orderBy) filters.push(`Ordering by: ${this.sortOrder()}`);
+
+            if (creatorId) {
+                this.#profileService.getProfile(creatorId)
+                    .pipe(takeUntilDestroyed(this.#destroyRef))
+                    .subscribe((user) => filters.push(`Events created by: ${user.name}`));
+            }
+
+            if (attendingId) {
+                this.#profileService.getProfile(attendingId)
+                    .pipe(takeUntilDestroyed(this.#destroyRef))
+                    .subscribe((user) => filters.push(`Events attended by: ${user.name}`));
+            }
+
+            this.filterDescription.set(filters.length ? filters.join('. ') : 'No filters applied.');
+        });
     }
 
-    addEvent(event: MyEvent) {
-        this.events.update((events) => [...events, event]);
+    loadEvents() {
+        this.#eventsService.getEvents(this.urlParams())
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe((response) => {
+                this.hasMoreEvents.set(response.more);
+                if (response.page === 1) {
+                    this.events.set(response.events);
+                } else {
+                    this.events.update((currentEvents) => [...currentEvents, ...response.events]);
+                }
+            });
     }
 
-    deleteEvent(event: MyEvent) {
-        this.events.update((events) => events.filter((e) => e !== event));
-    }
+    sortByDate = () => {
+        this.sortEvents('date');
+        this.sortOrder.set('date');
+    };
 
-    orderDate() {
-        this.events.update((events) =>
-            events.toSorted((e1, e2) => e1.date.localeCompare(e2.date))
+    sortByPrice = () => {
+        this.sortEvents('price');
+        this.sortOrder.set('price');
+    };
+
+    sortByDistance = () => {
+        this.sortEvents('distance');
+        this.sortOrder.set('distance');
+    };
+
+    sortEvents(orderBy: 'date' | 'price' | 'distance') {
+        this.events.update((currentEvents) =>
+            currentEvents.sort((a, b) => {
+                if (orderBy === 'price') {
+                    return a.price - b.price;
+                } else if (orderBy === 'distance') {
+                    return a.distance - b.distance;
+                }
+                return a.date.localeCompare(b.date);
+            })
         );
     }
 
-    orderPrice() {
-        this.events.update((events) =>
-            events.toSorted((e1, e2) => e1.price - e2.price)
-        );
+    addEvent(newEvent: MyEvent) {
+        this.events.update((currentEvents) => [...currentEvents, newEvent]);
+    }
+
+    removeEvent(event: MyEvent) {
+        this.events.update((currentEvents) => currentEvents.filter((e) => e !== event));
+    }
+
+    resetSearch() {
+        this.currentPage.set(1);
+        this.sortOrder.set('');
+    }
+
+    loadMoreEvents() {
+        if (this.hasMoreEvents()) {
+            this.currentPage.update((page) => page + 1);
+        }
     }
 }

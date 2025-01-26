@@ -8,13 +8,12 @@ import { catchError, map, Observable, of } from 'rxjs';
 	providedIn: 'root'
 })
 export class AuthService {
-	private http = inject(HttpClient);
+	#http = inject(HttpClient);
 	#logged: WritableSignal<boolean> = signal(false);
-
 
 	login(user: UserLogin) {
 		const loginUrl = 'auth/login';
-		return this.http.post<TokenResponse>(loginUrl, user).pipe(map((res: TokenResponse) => {
+		return this.#http.post<TokenResponse>(loginUrl, user).pipe(map((res: TokenResponse) => {
 			localStorage.setItem('token', res.accessToken);
 			this.#logged.set(true);
 		}));
@@ -26,20 +25,17 @@ export class AuthService {
 
 	register(user: User): Observable<void> {
 		const registerUrl = 'auth/register';
-
-		return this.http.post<UsersResponse>(registerUrl, user).pipe(map(() => {
+		return this.#http.post<UsersResponse>(registerUrl, user).pipe(map(() => {
 			console.log('User registered');
 		}));
 	}
 
 	validateToken(): Observable<boolean> {
-		const token = localStorage.getItem('token');
-		const headers = { Authorization: `Bearer ${token}` };
-
-		return this.http.get("auth/validate", { headers }).pipe(map(() => {
-			this.#logged.set(true);
-			return true;
-		}),
+		return this.#http.get('auth/validate').pipe(
+			map(() => {
+				this.#logged.set(true);
+				return true;
+			}),
 			catchError(() => {
 				localStorage.removeItem('token');
 				this.#logged.set(false);
@@ -47,6 +43,7 @@ export class AuthService {
 			})
 		);
 	}
+
 
 	isLogged(): Observable<boolean> {
 		const token = localStorage.getItem('token');

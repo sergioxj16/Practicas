@@ -1,6 +1,66 @@
 <div class="mt-4">
-  <event-card [event]="event()" (deleted)="goBack()"></event-card>
+    <event-card [event]="event()" (attend)="updateInfo()"></event-card>
 </div>
-<div class="mt-4 mb-4">
-  <button class="btn btn-success" (click)="goBack()">Go back</button>
+
+<div class="card mt-4" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header bg-success text-white" id="eventAddress">{{event().address}}</div>
+    <ol-map [coordinates]="[event().lat, event().lng]">
+        <ol-marker [coordinates]="[event().lat, event().lng]"></ol-marker>
+    </ol-map>
+</div>
+
+@if (attendees().length) {
+<div class="card mt-4 mb-4" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header bg-danger text-white" id="attendeesTitle">Attendees</div>
+    <ul class="list-group" id="attendeesList">
+        @for (user of attendees(); track user.id) {
+        <li class="list-group-item d-flex align-items-center">
+            <a class="avatar" [routerLink]="['/profile', user.id]">
+                <img class="rounded-circle float-start me-3" [src]="user.avatar" alt="User Avatar"
+                    style="width: 40px; height: 40px;" />
+            </a>
+            <div>
+                <div><a class="text-decoration-none name" [routerLink]="['/profile', user.id]">{{user.name}}</a></div>
+                <div><small class="email">{{user.email}}</small></div>
+            </div>
+        </li>
+        }
+    </ul>
+</div>
+}
+
+@if (comments().length) {
+<div class="card mt-4 mb-4" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header bg-info text-white" id="commentsTitle">User Comments</div>
+    <ul class="list-group" id="userCommentsList">
+        @for (comment of comments(); track comment.id) {
+        <li class="list-group-item d-flex align-items-center">
+            <a class="avatar" [routerLink]="['/profile', comment.user.id]">
+                <img class="rounded-circle float-start me-3" [src]="comment.user.avatar" alt="User Avatar"
+                    style="width: 40px; height: 40px;" />
+            </a>
+            <div>
+                <div><a class="text-decoration-none name"
+                        [routerLink]="['/profile', comment.user.id]">{{comment.user.name}}</a></div>
+                <div><small class="email">{{comment.user.email}}</small></div>
+            </div>
+            <p>{{comment.comment}}</p>
+        </li>
+        }
+    </ul>
+</div>
+}
+
+@if (event().attend) {
+<form class="mt-4" [formGroup]="commentForm" style="max-width: 600px; margin: 0 auto;">
+    <div class="form-group">
+        <textarea formControlName="message" class="form-control" name="comment" placeholder="Write a comment"
+            rows="3"></textarea>
+    </div>
+    <button (click)="sendComment()" class="btn btn-primary mt-3" [disabled]="commentForm.invalid">Send</button>
+</form>
+}
+
+<div class="mt-4 mb-4 text-center">
+    <button class="btn btn-success" (click)="goBack()">Go back</button>
 </div>

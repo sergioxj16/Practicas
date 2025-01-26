@@ -15,14 +15,14 @@ import { GeolocationService } from '../services/geolocation.service';
 	styleUrl: './login.component.css'
 })
 export class LoginComponent {
-	private router = inject(Router);
-	private authService = inject(AuthService);
-	private destroyed = inject(DestroyRef);
-	private formBuilder = inject(NonNullableFormBuilder);
+	#router = inject(Router);
+	#authService = inject(AuthService);
+	#destroyed = inject(DestroyRef);
+	#formBuilder = inject(NonNullableFormBuilder);
 
 	errorMessage = signal<number | null>(null);;
 
-	loginForm = this.formBuilder.group({
+	loginForm = this.#formBuilder.group({
 		email: ['', [Validators.required, Validators.email]],
 		password: ['', [Validators.required]],
 	});
@@ -44,10 +44,10 @@ export class LoginComponent {
 				console.log(err);
 			});
 
-		this.authService.login(user).pipe(takeUntilDestroyed(this.destroyed)).subscribe({
+		this.#authService.login(user).pipe(takeUntilDestroyed(this.#destroyed)).subscribe({
 			next: () => {
 				this.errorMessage.set(null);
-				this.router.navigate(['/events']);
+				this.#router.navigate(['/events']);
 			},
 			error: (err) => {
 				this.errorMessage.set(err.status);

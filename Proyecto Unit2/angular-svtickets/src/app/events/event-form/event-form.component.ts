@@ -7,8 +7,8 @@ import { EncodeBase64Directive } from '../../shared/directives/encode-base64.dir
 import { MinDateDirective } from '../../shared/directives/min-date.directive';
 import { ValidationClassesDirective } from '../../shared/directives/validation-classes.directive';
 import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
-import { EventsService } from '../services/events.service';
 import { MyEvent } from '../../shared/interfaces/myevent';
+import { EventsService } from '../services/events.service';
 
 @Component({
     selector: 'event-form',
@@ -16,18 +16,36 @@ import { MyEvent } from '../../shared/interfaces/myevent';
     templateUrl: './event-form.component.html',
     styleUrl: './event-form.component.css'
 })
+export class EventFormComponent {
+    // added = output<MyEvent>();
+    // #eventsService = inject(EventsService);
+    // #destroyRef = inject(DestroyRef);
+    // #router = inject(Router);
 
-export class EventFormComponent implements CanComponentDeactivate {
-    added = output<MyEvent>();
-    #eventsService = inject(EventsService);
-    #destroyRef = inject(DestroyRef);
-    #router = inject(Router);
-    saved = false;
+    // newEvent: MyEvent = {
+    //     title: '',
+    //     description: '',
+    //     date: '',
+    //     image: '',
+    //     price: 0,
+    // };
+    // saved = false;
+    // today = new Date().toISOString().slice(0, 10);
 
-    canDeactivate() {
-        return (
-            this.saved ||
-            confirm('¿Quieres abandonar la página?. Los cambios se perderán...')
-        );
-    }
+    // addEvent() {
+    //     this.#eventsService
+    //         .addEvent(this.newEvent)
+    //         .pipe(takeUntilDestroyed(this.#destroyRef))
+    //         .subscribe(() => {
+    //             this.saved = true;
+    //             this.#router.navigate(['/events']);
+    //         });
+    // }
+
+    // canDeactivate() {
+    //     return (
+    //         this.saved ||
+    //         confirm('¿Quieres abandonar la página?. Los cambios se perderán...')
+    //     );
+    // }
 }

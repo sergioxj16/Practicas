@@ -1,7 +1,7 @@
 import { User } from "./user";
 
 export interface MyEvent extends MyEventInsert {
-    id?: number;
+    id: number;
     creator: User;
     distance: number;
     numAttend: number;

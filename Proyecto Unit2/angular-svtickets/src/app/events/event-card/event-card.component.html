@@ -19,15 +19,36 @@
                 </a>
                 }
             </div>
-            
-            <!-- <button class="btn btn-danger delete" (click)="deleteEvent()">
-            <i class="bi bi-trash"></i>
-        </button> -->
         </div>
+        <div class="col-auto ms-auto">
+            <div class="text-end attend-users">
+                <i class="bi bi-people-fill"></i> {{ event().numAttend }}
+            </div>
+            <div class="text-end m-0 attend-button" [ngClass]="{
+            'bi-hand-thumbs-up-fill text-success': event().attend, 
+            'bi-hand-thumbs-down-fill text-danger': !event().attend
+            }" (click)="ToggleAttendEvent()" tabindex="0" (keydown.enter)="ToggleAttendEvent()">
+                {{ event().attend ? 'Im going': 'Not going' }}
+            </div>
+        </div>
+
         <div class="card-footer text-muted row m-0">
-            <div class="col">{{ event().date | date : "dd/MM/yyyy" }}</div>
-            <div class="col text-end">
-                {{ event().price | intlCurrency : "EUR" : "es-ES" }}
+            <div class="col-auto avatar pl-1 pr-1">
+                <a [routerLink]="event().mine ? ['/profile'] : ['/profile', event().creator.id]">
+                    <img [src]="event().creator.avatar" class="rounded-circle" [alt]="event().creator.name" />
+                </a>
+            </div>
+            <div class="col">
+                <div class="name"><a [routerLink]="event().mine ? ['/profile'] : ['/profile', event().creator.id]">{{
+                        event().creator.name }}</a></div>
+                <div class="date small text-muted">{{ event().date | date : "dd/MM/yyyy" }}</div>
+            </div>
+            <div class="col-auto text-end text-muted">
+                <div class="price small">
+                    {{ event().price | intlCurrency : "EUR" : "es-ES" }}
+                </div>
+                <div class="distance small">{{ event().distance }} Km</div>
             </div>
         </div>
     </div>
+</div>

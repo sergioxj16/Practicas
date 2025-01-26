@@ -16,13 +16,13 @@ import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
 	styleUrl: './register.component.css'
 })
 export class RegisterComponent implements CanComponentDeactivate {
-	private router = inject(Router);
-	private authService = inject(AuthService);
-	private formBuilder = inject(NonNullableFormBuilder);
+	#router = inject(Router);
+	#authService = inject(AuthService);
+	#formBuilder = inject(NonNullableFormBuilder);
 
 	errorMessage = signal<number | null>(null);;
 
-	registerForm = this.formBuilder.group({
+	registerForm = this.#formBuilder.group({
 		name: ['', [Validators.required]],
 		email: ['', [Validators.required, Validators.email]],
 		emailConfirm: ['', [Validators.required, Validators.email]],
@@ -55,9 +55,9 @@ export class RegisterComponent implements CanComponentDeactivate {
 			avatar: this.base64image
 		};
 
-		this.authService.register(user).subscribe({
+		this.#authService.register(user).subscribe({
 			next: () => {
-				this.router.navigate(['/login']);
+				this.#router.navigate(['/login']);
 				this.saved = true;
 				this.errorMessage.set(null);
 			},

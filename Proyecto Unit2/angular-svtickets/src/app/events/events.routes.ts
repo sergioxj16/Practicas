@@ -4,33 +4,33 @@ import { numericIdGuard } from '../shared/guards/numeric-id.guard';
 import { eventResolver } from './resolvers/event-resolver.resolver';
 
 export const eventsRoutes: Routes = [
-  {
-    path: '',
-    loadComponent: () =>
-      import('./events-page/events-page.component').then(
-        (m) => m.EventsPageComponent
-      ),
-    title: 'Eventos | SVTickets',
-  },
-  {
-    path: 'add',
-    canDeactivate: [leavePageGuard],
-    loadComponent: () =>
-      import('./event-form/event-form.component').then(
-        (m) => m.EventFormComponent
-      ),
-    title: 'Add event | SVTickets',
-  },
-  {
-    path: ':id',
-    canDeactivate: [leavePageGuard],
-    canActivate: [numericIdGuard],
-    resolve: {
-      event: eventResolver,
+    {
+        path: '',
+        loadComponent: () =>
+            import('./events-page/events-page.component').then(
+                (m) => m.EventsPageComponent
+            ),
+        title: 'Eventos | SVTickets',
     },
-    loadComponent: () =>
-      import('./event-detail/event-detail.component').then(
-        (m) => m.EventDetailComponent
-      ),
-  },
+    {
+        path: 'add', canDeactivate: [leavePageGuard],
+        resolve: {
+            event: eventResolver,
+        },
+        loadComponent: () =>
+            import('./event-form/event-form.component').then(
+                (m) => m.EventFormComponent
+            ),
+        title: 'add event | SVTickets',
+    },
+    {
+        path: ':id', canDeactivate: [leavePageGuard], canActivate: [numericIdGuard],
+        resolve: {
+            event: eventResolver,
+        },
+        loadComponent: () =>
+            import('./event-detail/event-detail.component').then(
+                (m) => m.EventDetailComponent
+            ),
+    },
 ];

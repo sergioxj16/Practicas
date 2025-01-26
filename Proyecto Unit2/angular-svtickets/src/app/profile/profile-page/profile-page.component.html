@@ -1,0 +1,88 @@
+<div class="row mt-4" id="profile">
+    <div class="col-3">
+        <div>
+            <img class="img-thumbnail rounded w-100" id="avatar" src="{{ user().avatar }}" alt="" />
+            @if (user().me && isProfileFormVisible===false && isPasswordFormVisible===false) {
+
+            <label class="btn btn-sm btn-danger">
+                <i class="bi bi-image"></i>
+                <input type="file" id="photoInput" class="d-none" encodeBase64 (encoded)="handleAvatarUpdate($event)" />
+            </label>
+            }
+        </div>
+    </div>
+
+    <div class="col-9" id="profileInfo">
+        <h4 id="nameDisplay">{{ user().name }}</h4>
+        <h4 id="emailDisplay">
+            <small class="text-muted">{{ user().email }}</small>
+        </h4>
+        @if (user().me && isProfileFormVisible===false && isPasswordFormVisible===false) {
+        <div>
+            <button class="btn btn-primary" id="editProfile" (click)="showProfileForm()">
+                <i class="fa-regular fa-pen-to-square"></i>
+                Edit profile
+            </button>
+            <button class="btn btn-success" id="editPassword" (click)="showPasswordForm()">
+                <i class="fa-solid fa-lock"></i>
+                Edit password
+            </button>
+        </div>
+        }
+
+        <div class="mt-3">
+            <a class="btn btn-outline-success" [routerLink]="['/events']" [queryParams]="{ creator: user().id }">
+                Events created by {{ user().name }}
+                <i class="bi bi-envelope-arrow-up"></i>
+            </a>
+        </div>
+        <div class="mt-3">
+            <a class="btn btn-outline-success" [routerLink]="['/events']" [queryParams]="{ attending: user().id }">
+                Events {{ user().name }} is attending
+                <i class="bi bi-person-check"></i>
+            </a>
+        </div>
+        @if (isProfileFormVisible) {
+        <div class="col-9" [formGroup]="profileForm">
+            <form (submit)="updateProfileInfo()">
+                <div class="mb-3">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" formControlName="name" placeholder="Name" />
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" formControlName="email" placeholder="Email" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-danger" (click)="hideFormButtons()">
+                    Cancel
+                </button>
+            </form>
+        </div>
+        } @if (isPasswordFormVisible) {
+        <div class="col-9" [formGroup]="passwordForm">
+            <form (submit)="updatePassword()">
+                <div class="mb-3">
+                    <label for="password">New Password:</label>
+                    <input type="password" class="form-control" formControlName="password" name="password" id="password"
+                        placeholder="New Password" />
+                    <label for="password2">Repeat password:</label>
+                    <input type="password" class="form-control" formControlName="password2" name="password2"
+                        id="password2" placeholder="Repeat Password" />
+                </div>
+                <button type="submit" class="btn btn-success">Save</button>
+                <button type="button" class="btn btn-danger" (click)="hideFormButtons()">
+                    Cancel
+                </button>
+            </form>
+        </div>
+        }
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white" id="eventAddress">
+            Coordenadas: Lat: {{ user().lat }}, Lng: {{ user().lng }}
+        </div>
+        <ol-map [coordinates]="[user().lat, user().lng]">
+            <ol-marker [coordinates]="[user().lat, user().lng]"></ol-marker>
+        </ol-map>
+    </div>
+</div>

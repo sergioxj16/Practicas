@@ -1,18 +1,17 @@
-import { TestBed } from '@angular/core/testing';
-import { ResolveFn } from '@angular/router';
+import { ResolveFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { EventsService } from '../services/events.service';
+import { catchError, EMPTY } from 'rxjs';
+import { MyEvent } from '../../shared/interfaces/myevent';
 
-import { eventResolver } from './event-resolver.resolver';
-import { MyEvent } from '../interfaces/my-event';
+export const eventResolver: ResolveFn<MyEvent> = (route) => {
+  const eventsService = inject(EventsService);
+  const router = inject(Router);
 
-describe('eventResolver', () => {
-  const executeResolver: ResolveFn<MyEvent> = (...resolverParameters) =>
-      TestBed.runInInjectionContext(() => eventResolver(...resolverParameters));
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-  });
-
-  it('should be created', () => {
-    expect(executeResolver).toBeTruthy();
-  });
-});
+  return eventsService.getEvent(+route.params["id"]).pipe(
+    catchError(() => {
+      router.navigate(["/events"]);
+      return EMPTY;
+    })
+  );
+};

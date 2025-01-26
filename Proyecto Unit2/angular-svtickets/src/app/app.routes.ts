@@ -8,11 +8,18 @@ export const routes: Routes = [
 
     {
         path: "auth", canActivate: [logoutActivateGuard],
-        loadChildren: () => import("./auth/auth.routes").then(r => r.authRoutes)
+        loadChildren: () =>
+            import("./auth/auth.routes").then(r => r.authRoutes)
     },
     {
         path: "events", canActivate: [loginActivateGuard],
-        loadChildren: () => import("./events/events.routes").then(r => r.eventsRoutes)
+        loadChildren: () =>
+            import("./events/events.routes").then(r => r.eventsRoutes)
+    },
+    {
+        path: 'profile', canActivate: [loginActivateGuard],
+        loadChildren: () =>
+            import('./profile/profile-routes').then((m) => m.profileRoutes)
     },
 
     { path: '', redirectTo: '/auth/login', pathMatch: 'full' },

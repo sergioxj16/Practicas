@@ -9,7 +9,7 @@ import {
 	SingleEventResponse,
 	UsersResponse,
 } from '../../shared/interfaces/responses';
-import { MyEvent } from '../../shared/interfaces/myevent';
+import { MyEvent, MyEventInsert } from '../../shared/interfaces/myevent';
 
 @Injectable({
 	providedIn: 'root',
@@ -30,9 +30,15 @@ export class EventsService {
 			.pipe(map((resp) => resp.event));
 	}
 
-	addEvent(event: MyEvent): Observable<MyEvent> {
+	addEvent(event: MyEventInsert): Observable<MyEvent> {
 		return this.#http
 			.post<SingleEventResponse>(`${this.#eventsUrl}`, event)
+			.pipe(map((resp) => resp.event));
+	}
+
+	updateEvent(event: MyEventInsert, id: number): Observable<MyEvent> {
+		return this.#http
+			.put<SingleEventResponse>(`events/${id}`, event)
 			.pipe(map((resp) => resp.event));
 	}
 

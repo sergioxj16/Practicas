@@ -1,51 +1,139 @@
-import { DatePipe } from '@angular/common';
-import { Component, DestroyRef, inject, output } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import {
+    Component,
+    DestroyRef,
+    effect,
+    inject,
+    input,
+    output,
+    signal,
+} from '@angular/core';
+import {
+    NonNullableFormBuilder,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EncodeBase64Directive } from '../../shared/directives/encode-base64.directive';
-import { MinDateDirective } from '../../shared/directives/min-date.directive';
 import { ValidationClassesDirective } from '../../shared/directives/validation-classes.directive';
-import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
-import { MyEvent } from '../../shared/interfaces/myevent';
+import { OlMapDirective } from '../../shared/directives/ol-maps/ol-map.directive';
+import { OlMarkerDirective } from '../../shared/directives/ol-maps/ol-marker.directive';
+import { GaAutocompleteDirective } from '../../shared/directives/ol-maps/ga-autocomplete.directive';
 import { EventsService } from '../services/events.service';
+import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
+import { MyEvent } from '../interfaces/my-event';
+import { SearchResult } from '../../shared/directives/ol-maps/search-result';
+import { MyEventInsert } from '../../shared/interfaces/myevent';
 
 @Component({
+    standalone: true,
     selector: 'event-form',
-    imports: [FormsModule, EncodeBase64Directive, ValidationClassesDirective, MinDateDirective, DatePipe],
+    imports: [
+        ReactiveFormsModule,
+        EncodeBase64Directive,
+        ValidationClassesDirective,
+        OlMapDirective,
+        OlMarkerDirective,
+        GaAutocompleteDirective,
+    ],
     templateUrl: './event-form.component.html',
-    styleUrl: './event-form.component.css'
+    styleUrls: ['./event-form.component.css'],
 })
-export class EventFormComponent {
-    // added = output<MyEvent>();
-    // #eventsService = inject(EventsService);
-    // #destroyRef = inject(DestroyRef);
-    // #router = inject(Router);
+export class EventFormComponent implements CanComponentDeactivate {
+    #eventsService = inject(EventsService);
+    #router = inject(Router);
+    #formBuilder = inject(NonNullableFormBuilder);
+    #destroyRef = inject(DestroyRef);
 
-    // newEvent: MyEvent = {
-    //     title: '',
-    //     description: '',
-    //     date: '',
-    //     image: '',
-    //     price: 0,
-    // };
-    // saved = false;
-    // today = new Date().toISOString().slice(0, 10);
+    currentEvent = input.required<MyEvent>();
+    eventDeleted = output<number>();
+    eventAttended = output<void>();
 
-    // addEvent() {
-    //     this.#eventsService
-    //         .addEvent(this.newEvent)
-    //         .pipe(takeUntilDestroyed(this.#destroyRef))
-    //         .subscribe(() => {
-    //             this.saved = true;
-    //             this.#router.navigate(['/events']);
-    //         });
-    // }
+    eventCoordinates = signal<[number, number]>([-0.5, 38.5]);
+    eventAddress = '';
+    eventImageBase64 = '';
+    isEventSaved = false;
 
-    // canDeactivate() {
-    //     return (
-    //         this.saved ||
-    //         confirm('¿Quieres abandonar la página?. Los cambios se perderán...')
-    //     );
-    // }
+    eventDetailsForm = this.#formBuilder.group({
+        title: [
+            '',
+            [
+                Validators.required,
+                Validators.minLength(5),
+                Validators.pattern('^[a-zA-Z][a-zA-Z ]*$'),
+            ],
+        ],
+        date: ['', [Validators.required,]],
+        description: ['', Validators.required],
+        price: [0, [Validators.required, Validators.min(1)]],
+        image: ['', Validators.required],
+        address: ['', Validators.required],
+    });
+
+    constructor() {
+        effect(() => {
+            if (this.currentEvent) {
+                this.populateEventForm(this.currentEvent());
+            }
+        });
+    }
+
+    private populateEventForm(eventData: MyEvent): void {
+        this.eventDetailsForm.patchValue({
+            title: eventData.title,
+            date: eventData.date.split(' ')[0],
+            description: eventData.description,
+            price: eventData.price,
+        });
+        this.eventImageBase64 = eventData.image;
+    }
+
+    handlePlaceChange(placeDetails: SearchResult): void {
+        this.eventCoordinates.set(placeDetails.coordinates);
+        this.eventAddress = placeDetails.address;
+    }
+
+    saveOrUpdateEvent(): void {
+        const { title, date, description, price,  } = this.eventDetailsForm.controls;
+
+        const newEventDetails: MyEventInsert = {
+            title: title.value!,
+            date: date.value!,
+            description: description.value!,
+            price: price.value!,
+            image: this.eventImageBase64,
+            lat: this.eventCoordinates()[1],
+            lng: this.eventCoordinates()[0],
+            address: this.eventAddress,
+        };
+
+        const eventAction$ = this.currentEvent
+            ? this.#eventsService.updateEvent(newEventDetails, this.currentEvent().id!)
+            : this.#eventsService.addEvent(newEventDetails);
+
+        eventAction$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
+            this.isEventSaved = true;
+            this.#router.navigate(['/events']);
+        });
+    }
+
+    handleFileInputChange(fileInputEvent: Event): void {
+        const inputElement = fileInputEvent.target as HTMLInputElement;
+        const selectedFile = inputElement?.files?.[0];
+        if (selectedFile) {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                this.eventImageBase64 = fileReader.result as string;
+            };
+            fileReader.readAsDataURL(selectedFile);
+        } else {
+            this.eventImageBase64 = '';
+        }
+    }
+
+    canDeactivate() {
+        return this.isEventSaved || confirm('¿Quieres abandonar la página?. Los cambios se perderán...');
+    }
+
+
 }

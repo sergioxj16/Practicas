@@ -14,9 +14,6 @@ export const eventsRoutes: Routes = [
     },
     {
         path: 'add', canDeactivate: [leavePageGuard],
-        resolve: {
-            event: eventResolver,
-        },
         loadComponent: () =>
             import('./event-form/event-form.component').then(
                 (m) => m.EventFormComponent

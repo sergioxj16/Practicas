@@ -4,8 +4,8 @@
 
 <div class="card mt-4" style="max-width: 600px; margin: 0 auto;">
     <div class="card-header bg-success text-white" id="eventAddress">{{event().address}}</div>
-    <ol-map [coordinates]="[event().lat, event().lng]">
-        <ol-marker [coordinates]="[event().lat, event().lng]"></ol-marker>
+    <ol-map [coordinates]="[event().lng, event().lat]">
+        <ol-marker [coordinates]="[event().lng, event().lat]"></ol-marker>
     </ol-map>
 </div>
 

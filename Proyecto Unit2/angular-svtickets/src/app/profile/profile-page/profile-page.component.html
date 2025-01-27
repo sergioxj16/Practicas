@@ -81,8 +81,8 @@
         <div class="card-header bg-success text-white" id="eventAddress">
             Coordenadas: Lat: {{ user().lat }}, Lng: {{ user().lng }}
         </div>
-        <ol-map [coordinates]="[user().lat, user().lng]">
-            <ol-marker [coordinates]="[user().lat, user().lng]"></ol-marker>
+        <ol-map [coordinates]="[user().lng, user().lat]">
+            <ol-marker [coordinates]="[user().lng, user().lat]"></ol-marker>
         </ol-map>
     </div>
 </div>

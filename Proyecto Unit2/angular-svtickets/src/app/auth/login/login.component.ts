@@ -37,8 +37,8 @@ export class LoginComponent {
 
 		GeolocationService.getLocation()
 			.then((coords) => {
-				user.lat = (coords.latitude);
-				user.lng = (coords.longitude);
+				user.lat = coords.latitude;
+				user.lng = coords.longitude;
 			})
 			.catch((err) => {
 				console.log(err);

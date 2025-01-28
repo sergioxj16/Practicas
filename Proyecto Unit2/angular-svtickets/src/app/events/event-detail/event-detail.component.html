@@ -1,4 +1,4 @@
-<div class="mt-4">
+<div class="mt-4" style="max-width: 600px; margin: 0 auto;">
     <event-card [event]="event()" (attend)="updateInfo()"></event-card>
 </div>
 
@@ -16,8 +16,7 @@
         @for (user of attendees(); track user.id) {
         <li class="list-group-item d-flex align-items-center">
             <a class="avatar" [routerLink]="['/profile', user.id]">
-                <img class="rounded-circle float-start me-3" [src]="user.avatar" alt="User Avatar"
-                    style="width: 40px; height: 40px;" />
+                <img class="rounded-circle float-start me-3" [src]="user.avatar" alt="User Avatar"/>
             </a>
             <div>
                 <div><a class="text-decoration-none name" [routerLink]="['/profile', user.id]">{{user.name}}</a></div>

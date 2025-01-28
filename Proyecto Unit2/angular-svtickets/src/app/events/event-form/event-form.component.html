@@ -1,13 +1,16 @@
-<form class="mt-4" (ngSubmit)="saveOrUpdateEvent()" [formGroup]="eventDetailsForm">
+<form class="mt-4" (ngSubmit)="addEvent()" [formGroup]="eventForm">
 
     <div class="mb-3">
         <label for="title" class="form-label">Title</label>
         <input type="text" class="form-control" id="title" placeholder="Enter title" formControlName="title"
             [validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}">
-        @let titleErrors = eventDetailsForm.get('title')?.errors;
+        @let titleErrors = eventForm.get('title')?.errors;
+
         @if(titleErrors?.['required']) {
-        <div class="invalid-feedback">Title is mandatory</div>
+
+        <div class="invalid-feedback">Title is required</div>
         }
+
         @if(titleErrors?.['minlength']) {
         <div class="invalid-feedback">
             Write at least
@@ -24,9 +27,13 @@
         <label for="date" class="form-label">Date</label>
         <input type="date" class="form-control" id="date" formControlName="date"
             [validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}">
-        @let dateErrors = eventDetailsForm.get('date')?.errors;
+        @let dateErrors = eventForm.get('date')?.errors;
         @if(dateErrors?.['required']) {
-        <div class="invalid-feedback">Date is mandatory</div>
+        <div class="invalid-feedback">Date is required</div>
+        }
+
+        @if (dateErrors?.['minDate']) {
+        <div class="invalid-feedback">The date must be from today {{todayDate |date:'MM/dd/yyyy'}}</div>
         }
     </div>
 
@@ -34,9 +41,9 @@
         <label for="description" class="form-label">Description</label>
         <textarea class="form-control" id="description" rows="3" formControlName="description"
             [validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}"></textarea>
-        @let descErrors = eventDetailsForm.get('description')?.errors;
+        @let descErrors = eventForm.get('description')?.errors;
         @if(descErrors?.['required']) {
-        <div class="invalid-feedback">Description is mandatory</div>
+        <div class="invalid-feedback">Description is required</div>
         }
     </div>
 
@@ -44,9 +51,9 @@
         <label for="price" class="form-label">Price (in €)</label>
         <input type="number" class="form-control" id="price" max="10000.00" step="0.01" formControlName="price"
             [validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}" />
-        @let priceErrors = eventDetailsForm.get('price')?.errors;
+        @let priceErrors = eventForm.get('price')?.errors;
         @if(priceErrors?.['required']) {
-        <div class="invalid-feedback">Price is mandatory</div>
+        <div class="invalid-feedback">Price is required</div>
         }
         @if(priceErrors?.['min']) {
         <div class="invalid-feedback">Price must be higher than 0</div>
@@ -58,9 +65,9 @@
         <input type="file" class="form-control" id="image" encodeBase64 (encoded)="eventImageBase64 = $event"
             (change)="handleFileInputChange($event)" formControlName="image"
             [validationClasses]="{valid: 'is-valid', invalid: 'is-invalid'}">
-        @let imageErrors = eventDetailsForm.get('image')?.errors;
+        @let imageErrors = eventForm.get('image')?.errors;
         @if(imageErrors?.['required']) {
-        <div class="invalid-feedback">Image is mandatory</div>
+        <div class="invalid-feedback">Image is required</div>
         }
     </div>
 
@@ -68,14 +75,17 @@
     <img [src]="eventImageBase64" alt="" class="img-thumbnail mb-3 rounded mx-auto d-block max"
         style="max-width: 200px;">
     }
+    <div class="mb-3">
+        <ol-map [coordinates]="eventCoordinates()">
+            <ga-autocomplete (locationChange)="handlePlaceChange($event)"></ga-autocomplete>
+            <ol-marker [coordinates]=" eventCoordinates()"></ol-marker>
+        </ol-map>
+    </div>
 
-    <ol-map [coordinates]="eventCoordinates()">
-        <ga-autocomplete (locationChange)="handlePlaceChange($event)" formControlName="address"></ga-autocomplete>
-        <ol-marker [coordinates]="eventCoordinates()"></ol-marker>
-    </ol-map>
 
-    <div>
-        <button type="submit" class="btn btn-primary" >Create</button>
+    <div class="d-grid gap-2 ">
+        <button type="submit" class="btn btn-primary" [disabled]="eventForm.invalid">Create</button>
     </div>
 
 </form>
+

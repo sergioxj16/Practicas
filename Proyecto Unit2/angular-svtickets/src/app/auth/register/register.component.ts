@@ -7,6 +7,8 @@ import { User } from '../../shared/interfaces/user';
 import { EncodeBase64Directive } from '../../shared/directives/encode-base64.directive';
 import { GeolocationService } from '../services/geolocation.service';
 import { CanComponentDeactivate } from '../../shared/guards/leave-page.guard';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmModalComponent } from '../../shared/modals/confirm-modal/confirm-modal.component';
 
 
 @Component({
@@ -19,6 +21,7 @@ export class RegisterComponent implements CanComponentDeactivate {
 	#router = inject(Router);
 	#authService = inject(AuthService);
 	#formBuilder = inject(NonNullableFormBuilder);
+	#modalService = inject(NgbModal);
 
 	errorMessage = signal<number | null>(null);;
 
@@ -83,11 +86,13 @@ export class RegisterComponent implements CanComponentDeactivate {
 				longitude?.setValue(0);
 			});
 	}
-	
+
 	canDeactivate() {
-		return (
-			this.saved ||
-			confirm('Do you want to leave the page? Changes will be lost...')
-		);
+		if (this.saved || this.registerForm.pristine) return true;
+
+		const modalRef = this.#modalService.open(ConfirmModalComponent);
+		modalRef.componentInstance.title = 'Changes will not be saved';
+		modalRef.componentInstance.body = 'Do you want to leave the page?. Changes will be lost...';
+		return modalRef.result.catch(() => false);
 	}
 }

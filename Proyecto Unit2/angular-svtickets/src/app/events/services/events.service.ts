@@ -37,8 +37,7 @@ export class EventsService {
 	}
 
 	updateEvent(event: MyEventInsert, id: number): Observable<MyEvent> {
-		return this.#http
-			.put<SingleEventResponse>(`events/${id}`, event)
+		return this.#http.put<SingleEventResponse>(`${this.#eventsUrl}/${id}`, event)
 			.pipe(map((resp) => resp.event));
 	}
 

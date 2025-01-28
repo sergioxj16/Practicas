@@ -1,9 +1,10 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, DestroyRef, inject, input, output } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { EventsService } from '../services/events.service';
 import { IntlCurrencyPipe } from '../../shared/pipes/intl-currency.pipe';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MyEvent } from '../../shared/interfaces/myevent';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -14,10 +15,10 @@ import { MyEvent } from '../../shared/interfaces/myevent';
 })
 export class EventCardComponent {
     #eventsService = inject(EventsService);
-    #router = inject(Router);
+    #destroyRef = inject(DestroyRef);
 
     event = input.required<MyEvent>();
-    deleted = output<void>();
+    deleted = output<number>();
     attend = output<void>();
 
     ToggleAttendEvent() {
@@ -35,7 +36,7 @@ export class EventCardComponent {
 
     deleteEvent() {
         this.#eventsService
-            .deleteEvent(this.event().id!)
-        this.#router.navigate(['/events']);
+            .deleteEvent(this.event().id!).pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => this.deleted.emit(this.event().id!));
     }
 }

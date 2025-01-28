@@ -31,9 +31,13 @@
 	@if(errorMessage() === 401) {
 	<div class="alert alert-danger">Email or password are incorrect.</div>
 	}
-	
+
 	<div>
 		<a class="btn btn-secondary" [routerLink]="['/auth/register']" role="button">Create account</a>
 		<button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Login</button>
 	</div>
+	<div>
+		<google-login class="btn" (login)="googleLogin($event)"></google-login>
+	</div>
+
 </form>

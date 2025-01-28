@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
-import { User, UserLogin } from '../../shared/interfaces/user';
+import { GoogleLogin, User, UserLogin } from '../../shared/interfaces/user';
 import { TokenResponse, UsersResponse } from '../../shared/interfaces/responses';
 import { catchError, map, Observable, of } from 'rxjs';
 
@@ -44,6 +44,20 @@ export class AuthService {
 		);
 	}
 
+	googleLogin(data: GoogleLogin): Observable<void> {
+		return this.#http.post<TokenResponse>(`auth/google`, data).pipe(
+			map((response: TokenResponse) => {
+				this.#logged.set(true);
+				localStorage.setItem('authToken', response.accessToken);
+			}),
+			catchError((error) => {
+				const errorMessage = Array.isArray(error.error);
+				alert(errorMessage);
+
+				return of();
+			})
+		);
+	}
 
 	isLogged(): Observable<boolean> {
 		const token = localStorage.getItem('token');

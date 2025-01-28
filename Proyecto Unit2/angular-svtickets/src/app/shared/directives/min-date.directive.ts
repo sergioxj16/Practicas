@@ -1,19 +1,12 @@
-import { Directive, input } from '@angular/core';
-import { NG_VALIDATORS, Validator, FormControl, ValidationErrors } from '@angular/forms';
+import { ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 
-@Directive({
-  selector: '[minDate]',
-  standalone: true,
-  providers: [{provide: NG_VALIDATORS, useExisting: MinDateDirective, multi: true}]
-})
-export class MinDateDirective implements Validator {
-  minDate = input.required<string>();
-
-  validate(control: FormControl<string>): ValidationErrors | null {
-      if (this.minDate() && control.value && this.minDate() > control.value) {
-        return { minDate: true }; // Error returned
-      }
-
-      return null; // No errors
-  }
+export function minDateValidator(minDate: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) {
+      return null;
+    }
+    const date = new Date(control.value);
+    const min = new Date(minDate);
+    return date >= min ? null : {minDate: {minDate, actual: control.value}};
+  };
 }

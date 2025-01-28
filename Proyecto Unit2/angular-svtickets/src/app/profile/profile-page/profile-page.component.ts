@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { Component, DestroyRef, effect, inject, model } from '@angular/core';
 import { OlMapDirective } from '../../shared/directives/ol-maps/ol-map.directive';
 import { OlMarkerDirective } from '../../shared/directives/ol-maps/ol-marker.directive';
 import { User, UserProfileEdit } from '../../shared/interfaces/user';
@@ -15,7 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     styleUrl: './profile-page.component.css',
 })
 export class ProfilePageComponent {
-    user = input.required<User>();
+    user = model.required<User>();
 
     isProfileFormVisible = false;
     isPasswordFormVisible = false;

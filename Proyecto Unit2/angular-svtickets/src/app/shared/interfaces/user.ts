@@ -28,3 +28,9 @@ export interface UserPhotoEdit {
 export interface UserPasswordEdit {
     password: string;
 }
+
+export interface GoogleLogin {
+    token: string,
+    lat: number,
+    lng: number
+}

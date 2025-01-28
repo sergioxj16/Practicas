@@ -3,24 +3,30 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink, } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ValidationClassesDirective } from '../../shared/directives/validation-classes.directive';
-import { UserLogin } from '../../shared/interfaces/user';
+import { GoogleLogin, UserLogin } from '../../shared/interfaces/user';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GeolocationService } from '../services/geolocation.service';
+import { GoogleLoginDirective } from '../google-login/google-login.directive';
 
 
 @Component({
 	selector: 'login',
-	imports: [ReactiveFormsModule, ValidationClassesDirective, RouterLink],
+	imports: [ReactiveFormsModule, ValidationClassesDirective, RouterLink, GoogleLoginDirective],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.css'
 })
 export class LoginComponent {
 	#router = inject(Router);
 	#authService = inject(AuthService);
-	#destroyed = inject(DestroyRef);
+	#destroyRef = inject(DestroyRef);
 	#formBuilder = inject(NonNullableFormBuilder);
 
 	errorMessage = signal<number | null>(null);;
+
+	loggedGoogle(resp: google.accounts.id.CredentialResponse) {
+		// Envia esto tu API
+		console.log(resp.credential);
+	}
 
 	loginForm = this.#formBuilder.group({
 		email: ['', [Validators.required, Validators.email]],
@@ -44,7 +50,7 @@ export class LoginComponent {
 				console.log(err);
 			});
 
-		this.#authService.login(user).pipe(takeUntilDestroyed(this.#destroyed)).subscribe({
+		this.#authService.login(user).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
 			next: () => {
 				this.errorMessage.set(null);
 				this.#router.navigate(['/events']);
@@ -53,5 +59,19 @@ export class LoginComponent {
 				this.errorMessage.set(err.status);
 			}
 		});
+	}
+	googleLogin(resp: google.accounts.id.CredentialResponse): void {
+		const userData: GoogleLogin = {
+			token: resp.credential,
+			lat: 0,
+			lng: 0,
+		};
+
+		this.#authService
+			.googleLogin(userData)
+			.pipe(takeUntilDestroyed(this.#destroyRef))
+			.subscribe(() => {
+				this.#router.navigate(['/events']);
+			});
 	}
 }

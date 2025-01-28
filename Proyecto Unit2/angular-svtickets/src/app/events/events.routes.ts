@@ -13,12 +13,13 @@ export const eventsRoutes: Routes = [
         title: 'Eventos | SVTickets',
     },
     {
-        path: 'add', canDeactivate: [leavePageGuard],
+        path: 'add',
+        canDeactivate: [leavePageGuard],
         loadComponent: () =>
             import('./event-form/event-form.component').then(
                 (m) => m.EventFormComponent
             ),
-        title: 'add event | SVTickets',
+        title: 'Add Event | Angular Events',
     },
     {
         path: ':id', canDeactivate: [leavePageGuard], canActivate: [numericIdGuard],
@@ -28,6 +29,17 @@ export const eventsRoutes: Routes = [
         loadComponent: () =>
             import('./event-detail/event-detail.component').then(
                 (m) => m.EventDetailComponent
+            ),
+    },
+    {
+        path: ':id/edit',
+        canActivate: [numericIdGuard],
+        resolve: {
+            event: eventResolver,
+        },
+        loadComponent: () =>
+            import('./event-form/event-form.component').then(
+                (m) => m.EventFormComponent
             ),
     },
 ];

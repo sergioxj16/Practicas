@@ -54,7 +54,7 @@ export class EventFormComponent implements CanComponentDeactivate {
         description: ['', Validators.required],
         price: [0, [Validators.required, Validators.min(1)]],
         image: ['', Validators.required],
-        address: ['',],
+        address: [''],
     });
 
     constructor() {
@@ -79,6 +79,7 @@ export class EventFormComponent implements CanComponentDeactivate {
             description: eventData.description,
             price: eventData.price,
             address: eventData.address,
+            
         });
         this.eventImageBase64 = eventData.image;
     }

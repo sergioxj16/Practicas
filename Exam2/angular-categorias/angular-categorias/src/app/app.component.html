@@ -1,0 +1,68 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="card border-0 col-xs-12 col-md-4 mb-3">
+            <div class="card-header bg-primary text-white">Categorías</div>
+            <div class="card-block">
+                <ul class="list-group">
+                    @if (categoria().length) {
+                        @for (cate of categoria(); track cate.id) {
+                            <li class="list-group-item list-group-item-action" (click)="seleccionarCategoria(cate.id)">
+                                {{ cate.nombre }}
+                            </li>
+                        }
+                    } @else {
+                        <div class="col">
+                            <div class="alert alert-info" role="alert">
+                                No hay categorías.
+                            </div>
+                        </div>
+                    }
+                </ul>
+            </div>
+        </div>
+        <!-- Sección de productos -->
+        <div class="card border-0 col-xs-12 col-md-8">
+            <div class="card-header bg-success text-white">Productos</div>
+            <div class="card-block mb-3">
+                <ul class="list-group">
+                    @if (productos().length) {
+                        @for (producto of productos(); track producto.id) {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div>{{ producto.nombre }}</div>
+                                    <div><strong>Precio: </strong> <span class="text-muted">{{ producto.precio }} €</span></div>
+                                </div>
+                                <button class="btn btn-outline-danger border-0 delete" (click)="eliminarProducto(producto.id!)">Borrar</button>
+                            </li>
+                        }
+                    } @else {
+                        <div class="col">
+                            <div class="alert alert-info" role="alert">
+                                No hay productos.
+                            </div>
+                        </div>
+                    }
+                </ul>
+            </div>
+            
+            <!-- Formulario para añadir productos -->
+            <form (ngSubmit)="addEvent()" [formGroup]="productForm">
+                <label class="mb-3 row">
+                    <span class="col-auto align-self-center">Nombre</span>
+                    <div class="col">
+                        <input class="form-control" type="text" formControlName="nombre"/>
+                    </div>
+                </label>
+                <label class="mb-3 row">
+                    <span class="col-auto align-self-center">Precio</span>
+                    <div class="col">
+                        <input class="form-control" type="number" step="0.01" formControlName="precio"/>
+                    </div>
+                </label>
+                <div class="col-auto">
+                    <button class="btn btn-primary" type="submit" [disabled]="productForm.invalid">Añadir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
